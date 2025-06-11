@@ -4,13 +4,14 @@ const opentelemetry = require('@opentelemetry/api');
 const { resourceFromAttributes } = require('@opentelemetry/resources');
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { AsyncLocalStorageContextManager } = require("@opentelemetry/context-async-hooks");
-const {CompositePropagator, W3CTraceContextPropagator, W3CBaggagePropagator} = require("@opentelemetry/core");
+const { CompositePropagator, W3CTraceContextPropagator, W3CBaggagePropagator } = require("@opentelemetry/core");
+const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+const { envDetector, processDetector } = require('@opentelemetry/resources');
 
 // Configure span processor to send spans to the exporter
-const exporter = new JaegerExporter({
-  endpoint: 'http://localhost:14268/api/traces',
+const exporter = new OTLPTraceExporter({
+  url: 'http://localhost:4318/v1/traces',
 });
 
 /**
@@ -29,11 +30,13 @@ opentelemetry.trace.setGlobalTracerProvider(new BasicTracerProvider({
   spanProcessors: [
     new SimpleSpanProcessor(exporter),
     new SimpleSpanProcessor(new ConsoleSpanExporter()),
-  ]
+  ],
+  resourceDetectors: [envDetector, processDetector]
 }));
 opentelemetry.context.setGlobalContextManager(new AsyncLocalStorageContextManager());
-opentelemetry.propagation.setGlobalPropagator(new CompositePropagator({ propagators: [
-  new W3CTraceContextPropagator(),
+opentelemetry.propagation.setGlobalPropagator(new CompositePropagator({
+  propagators: [
+    new W3CTraceContextPropagator(),
     new W3CBaggagePropagator()]
 }));
 

@@ -80,7 +80,7 @@ package.json.lerna_backup
 .DS_Store
 
 # VsCode configs
-.vscode/
+# .vscode/
 
 #Visual Studio
 .vs/
