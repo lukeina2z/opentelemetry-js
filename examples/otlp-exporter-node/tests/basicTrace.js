@@ -7,10 +7,22 @@ const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = requir
 const { AsyncLocalStorageContextManager } = require("@opentelemetry/context-async-hooks");
 const { CompositePropagator, W3CTraceContextPropagator, W3CBaggagePropagator } = require("@opentelemetry/core");
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+
+const {
+    awsBeanstalkDetector,
+    awsEc2Detector,
+    awsEcsDetector,
+    awsEksDetector,
+    awsLambdaDetector
+} = require('@opentelemetry/resource-detector-aws');
+
+const varFoo = awsBeanstalkDetector.detect();
+
+
 const {
     envDetector,
     processDetector,
-    hostDetector,
+    hostDetector
 } = require('@opentelemetry/resources');
 
 
@@ -22,11 +34,11 @@ const { FsInstrumentation } = require('@opentelemetry/instrumentation-fs');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
 registerInstrumentations({
-  instrumentations: [
-    new FsInstrumentation({
-      // see below for available configuration
-    }),
-  ],
+    instrumentations: [
+        new FsInstrumentation({
+            // see below for available configuration
+        }),
+    ],
 });
 
 
@@ -38,7 +50,11 @@ module.exports = async function testFn() {
     });
 
     const defaultResource = await detectResources({
-        detectors: [envDetector, processDetector, hostDetector],
+        detectors: [envDetector, processDetector, hostDetector, awsBeanstalkDetector,
+            awsEc2Detector,
+            awsEcsDetector,
+            awsEksDetector,
+            awsLambdaDetector],
     });
     const customResource = resourceFromAttributes({
         [ATTR_SERVICE_NAME]: 'xxyy-svc-foo',

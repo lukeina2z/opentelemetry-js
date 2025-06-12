@@ -43,6 +43,7 @@
             "sourceMaps": true,
             "resolveSourceMapLocations": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/../opentelemetry-js-contrib/detectors/node/opentelemetry-resource-detector-aws/**",
                 "${workspaceFolder}/../opentelemetry-js-contrib/plugins/node/instrumentation-fs/**",
                 "!**/node_modules/**"
             ],
