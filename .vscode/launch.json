@@ -26,7 +26,7 @@
             "type": "node"
         },
         {
-            "name": "dbg otlp-exporter-node",
+            "name": "aaa-dbg otel-js",
             "request": "launch",
             "runtimeArgs": [
                 "run-script",
