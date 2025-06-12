@@ -1,13 +1,21 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-const { detectResources, resourceFromAttributes } = require('@opentelemetry/resources');
-const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { AsyncLocalStorageContextManager } = require("@opentelemetry/context-async-hooks");
 const { CompositePropagator, W3CTraceContextPropagator, W3CBaggagePropagator } = require("@opentelemetry/core");
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+const { AsyncLocalStorageContextManager } = require("@opentelemetry/context-async-hooks");
 
+
+// Auto instrumentation
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
+const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+const { FsInstrumentation } = require('@opentelemetry/instrumentation-fs');
+
+// Resource Detector
+const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
+const { detectResources, resourceFromAttributes } = require('@opentelemetry/resources');
 const {
     awsBeanstalkDetector,
     awsEc2Detector,
@@ -18,30 +26,15 @@ const {
 
 const varFoo = awsBeanstalkDetector.detect();
 
-
 const {
     envDetector,
     processDetector,
     hostDetector
 } = require('@opentelemetry/resources');
 
-
 // const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 // const provider = new NodeTracerProvider();
 // provider.register();
-
-const { FsInstrumentation } = require('@opentelemetry/instrumentation-fs');
-const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-
-registerInstrumentations({
-    instrumentations: [
-        new FsInstrumentation({
-            // see below for available configuration
-        }),
-    ],
-});
-
-
 
 module.exports = async function testFn() {
     // Configure span processor to send spans to the exporter
@@ -56,8 +49,9 @@ module.exports = async function testFn() {
             awsEksDetector,
             awsLambdaDetector],
     });
+
     const customResource = resourceFromAttributes({
-        [ATTR_SERVICE_NAME]: 'xxyy-svc-foo',
+        [ATTR_SERVICE_NAME]: 'xxyy-svc-foo2',
     });
 
     const mergedResource = defaultResource.merge(customResource);
@@ -71,20 +65,31 @@ module.exports = async function testFn() {
      * do not register a global tracer provider, instrumentation which calls these
      * methods will receive no-op implementations.
      */
-    opentelemetry.trace.setGlobalTracerProvider(new BasicTracerProvider({
+    const tracerProvider = new BasicTracerProvider({
         resource: mergedResource,
         spanProcessors: [
             new SimpleSpanProcessor(exporter),
             new SimpleSpanProcessor(new ConsoleSpanExporter()),
         ],
         resourceDetectors: [envDetector, processDetector]
-    }));
+    });
+    opentelemetry.trace.setGlobalTracerProvider(tracerProvider);
     opentelemetry.context.setGlobalContextManager(new AsyncLocalStorageContextManager());
     opentelemetry.propagation.setGlobalPropagator(new CompositePropagator({
         propagators: [
             new W3CTraceContextPropagator(),
             new W3CBaggagePropagator()]
     }));
+
+    registerInstrumentations({
+        tracerProvider: tracerProvider,
+        instrumentations: [
+            new FsInstrumentation({
+            }),
+            new HttpInstrumentation({
+            })]
+        // instrumentations: getNodeAutoInstrumentations(),
+    });
 
     const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 
