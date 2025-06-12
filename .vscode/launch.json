@@ -22,7 +22,27 @@
             "sourceMaps": true,
             // "sourceMapPathOverrides": {
             //     "${workspaceFolder}/examples/basic-tracer-node/node_modules/@opentelemetry/*": "${workspaceFolder}/node_modules/@opentelemetry/*",
-
+            // },
+            "type": "node"
+        },
+        {
+            "name": "dbg otlp-exporter-node",
+            "request": "launch",
+            "runtimeArgs": [
+                "run-script",
+                "start"
+            ],
+            "cwd": "${workspaceFolder}/examples/otlp-exporter-node",
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ],
+            "sourceMaps": true,
+            // "sourceMapPathOverrides": {
+            //     "${workspaceFolder}/examples/basic-tracer-node/node_modules/@opentelemetry/*": "${workspaceFolder}/node_modules/@opentelemetry/*",
             // },
             "type": "node"
         },

@@ -5,6 +5,12 @@ This example shows how to use
 and [@opentelemetry/exporter-metrics-otlp-http](https://github.com/open-telemetry/opentelemetry-js/tree/v0.28.0/experimental/packages/opentelemetry-exporter-metrics-otlp-http)
 to instrument a simple Node.js application.
 
+## OTel Auto-Inst Setup
+
+```sh
+npm install @opentelemetry/instrumentation-fs --workspace=examples/otlp-exporter-node
+```
+
 ## Installation
 
 ```shell script
