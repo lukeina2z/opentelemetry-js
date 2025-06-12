@@ -13,6 +13,24 @@ const {
     hostDetector,
 } = require('@opentelemetry/resources');
 
+
+// const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+// const provider = new NodeTracerProvider();
+// provider.register();
+
+const { FsInstrumentation } = require('@opentelemetry/instrumentation-fs');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+
+registerInstrumentations({
+  instrumentations: [
+    new FsInstrumentation({
+      // see below for available configuration
+    }),
+  ],
+});
+
+
+
 module.exports = async function testFn() {
     // Configure span processor to send spans to the exporter
     const exporter = new OTLPTraceExporter({

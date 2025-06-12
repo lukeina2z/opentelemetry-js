@@ -41,7 +41,14 @@
                 "${workspaceFolder}/**/*.js"
             ],
             "sourceMaps": true,
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/../opentelemetry-js-contrib/plugins/node/instrumentation-fs/**",
+                "!**/node_modules/**"
+            ],
             // "sourceMapPathOverrides": {
+            //     "../../src/instrumentation.ts": "${workspaceFolder}/../opentelemetry-js-contrib/plugins/node/instrumentation-fs/src/instrumentation.ts",
+            //     "${workspaceFolder}/../opentelemetry-js-contrib/plugins/node/instrumentation-fs/src/instrumentation.ts": "../../src/instrumentation.ts",
             //     "${workspaceFolder}/examples/basic-tracer-node/node_modules/@opentelemetry/*": "${workspaceFolder}/node_modules/@opentelemetry/*",
             // },
             "type": "node"
