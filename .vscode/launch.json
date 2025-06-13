@@ -40,6 +40,10 @@
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ],
+            "env":{
+                "NODE_OPTIONS": "--enable-source-maps",
+                "OTEL_LOG_LEVEL": "all"
+            },
             "sourceMaps": true,
             "resolveSourceMapLocations": [
                 "${workspaceFolder}/**",
