@@ -19,10 +19,9 @@ function doWork(parent, tracer) {
     // Annotate our span to capture metadata about our operation
     span.addEvent('invoking doWork');
 
-    const spanContext = trace.setSpan(context.active(), span);
-    context.with(spanContext, () => {
+    const newContext = trace.setSpan(context.active(), span);
+    context.with(newContext, () => {
         openFooFromProfileSync();
-        console.log(`traceId: ${spanContext.traceId}`);
     });
 
     span.end();
@@ -32,7 +31,7 @@ module.exports = async function runTest() {
     const tracer = trace.getTracer('example-basic-tracer-node');
     // Create a span. A span must be closed.
     const parentSpan = tracer.startSpan('main');
-    for (let i = 0; i < 3; i += 1) {
+    for (let i = 0; i < 1; i += 1) {
         doWork(parentSpan, tracer);
     }
     // Be sure to end the span.
