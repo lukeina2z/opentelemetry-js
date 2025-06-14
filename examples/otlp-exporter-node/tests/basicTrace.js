@@ -2,10 +2,10 @@
 
 const { context, trace, ROOT_CONTEXT } = require('@opentelemetry/api');
 
-function doWork(parent, oTelApi, tracer) {
+function doWork(parent, tracer) {
     // Start another span. In this example, the main method already started a
     // span, so that'll be the parent span, and this will be a child span.
-    const ctx = oTelApi.trace.setSpan(oTelApi.context.active(), parent);
+    const ctx = trace.setSpan(context.active(), parent);
     const span = tracer.startSpan('doWork', undefined, ctx);
 
     // simulate some random work.
@@ -28,21 +28,15 @@ function doWork(parent, oTelApi, tracer) {
     span.end();
 }
 
-module.exports = async function main(oTelApi, oTelTracerProvider) {
-    const tracer = oTelApi.trace.getTracer('example-basic-tracer-node');
+module.exports = async function runTest() {
+    const tracer = trace.getTracer('example-basic-tracer-node');
     // Create a span. A span must be closed.
     const parentSpan = tracer.startSpan('main');
     for (let i = 0; i < 3; i += 1) {
-        doWork(parentSpan, oTelApi, tracer);
+        doWork(parentSpan, tracer);
     }
     // Be sure to end the span.
     parentSpan.end();
-
-    // flush and close the connection.
-    await oTelTracerProvider.shutdown();
-    // oTelApi.shutdown();
-    // exporter.shutdown();
-    console.log(`Tracer is down now.`);
 }
 
 const fs = require('fs');
@@ -61,11 +55,10 @@ function openFooFromProfileSync() {
     }
 }
 
-
 function openFooFromProfileAsync() {
     // Get the user's home directory (e.g., /Users/your-username)
     const homeDir = os.homedir();
-    
+
     // Construct full path to foo.txt
     const filePath = path.join(homeDir, 'foo.txt');
 

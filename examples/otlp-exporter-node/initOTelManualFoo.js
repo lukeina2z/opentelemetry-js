@@ -8,8 +8,6 @@ const { CompositePropagator, W3CTraceContextPropagator, W3CBaggagePropagator } =
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
 const { AsyncLocalStorageContextManager } = require("@opentelemetry/context-async-hooks");
 
-module.exports = initOTel;
-
 async function initOTel() {
     oTelApi.diag.setLogger(new oTelApi.DiagConsoleLogger(), oTelApi.DiagLogLevel.ALL);
     oTelApi.diag.debug(`start initializing otel-js.`);
@@ -46,7 +44,7 @@ async function initOTel() {
     }));
 
     initOTelAutoInst(oTelTracerProvider);
-    return {oTelApi, oTelTracerProvider};
+    return oTelTracerProvider;
 }
 
 // const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
@@ -100,3 +98,16 @@ async function initOTelResource(serviceName) {
 
     return defaultResource.merge(customResource);
 }
+
+module.exports = async function fooMain() {
+    const tracerProvider = await initOTel();
+    const testMain = require('./tests/basicTrace');
+
+    await testMain();
+
+    // flush and close the connection.
+    // await tracerProvider.shutdown();
+    const provider = oTelApi.trace.getTracerProvider();
+    await provider.getDelegate().shutdown();
+    console.log(`Tracer is down now.`);
+};
