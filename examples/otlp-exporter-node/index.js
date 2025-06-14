@@ -6,6 +6,7 @@ process.env.OTEL_SERVICE_NAME = 'X-Auto-Instr-Foo';
 process.env.OTEL_LOG_LEVEL = 'debug';
 // process.env.OTEL_LOG_LEVEL = 'verbose';
 // process.env.OTEL_LOG_LEVEL = 'all';
+process.env.OTEL_TRACES_EXPORTER="console,otlp";
 
 const autoMain = require('./initOTelAuto');
 
